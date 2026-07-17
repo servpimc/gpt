@@ -28,29 +28,22 @@
     </div>
 
     <script>
-        // L'URL fixe qui pointe en AJAX vers ton premier Worker de calcul
-        const WORKER_URL = "https://damp-salad-6faa.servpimc.workers.dev/"; 
+        const WORKER_URL = "https://agent-ia.servpimc.workers.dev/"; 
 
         async function sendMessage() {
             const input = document.getElementById('user-input');
             const messageText = input.value.trim();
             if (!messageText) return;
-
             appendMessage(messageText, 'user');
             input.value = '';
-
             const loadingId = appendMessage("L'agent réfléchit...", 'agent');
-
             try {
                 const response = await fetch(WORKER_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: messageText })
                 });
-                
                 const data = await response.json();
-                
-                // On injecte la réponse nettoyée reçue du backend gpt
                 document.getElementById(loadingId).innerText = data.response;
             } catch (error) {
                 document.getElementById(loadingId).innerText = "Erreur de connexion avec l'agent.";
@@ -60,8 +53,6 @@
         function appendMessage(text, sender) {
             const container = document.getElementById('chat-container');
             const messageDiv = document.createElement('div');
-            
-            // Ajout du paramètre "sender" (user ou agent) dans l'ID pour éviter les doublons instantanés !
             const id = 'msg-' + sender + '-' + Date.now(); 
             
             messageDiv.id = id;
