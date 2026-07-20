@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Agent Llama 4</title>
+    <title>IA quoi maintenan </title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #131314; color: #e3e3e3; margin: 0; display: flex; flex-direction: column; height: 100vh; }
         #chat-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
@@ -19,7 +19,7 @@
 <body>
 
     <div id="chat-container">
-        <div class="message agent">Bonjour ! Je suis ton agent Llama 4 hébergé sur Cloudflare. Pose-moi une question !</div>
+        <div class="message agent">Bienvenue ! Qu'est-ce que vous aimeriez savoir?</div>
     </div>
 
     <div id="input-container">
@@ -28,31 +28,23 @@
     </div>
 
     <script>
-        // METTEZ VOTRE LIEN ICI (Gardez bien les guillemets)
-        const WORKER_URL = "VOTRE_URL_WORKER"; 
+        const WORKER_URL = "https://agent-ia.servpimc.workers.dev/"; 
 
         async function sendMessage() {
             const input = document.getElementById('user-input');
             const messageText = input.value.trim();
             if (!messageText) return;
-
-            // Afficher le message de l'utilisateur
             appendMessage(messageText, 'user');
             input.value = '';
-
-            // Ajouter une bulle de chargement temporaire
-            const loadingId = appendMessage("L'agent réfléchit...", 'agent');
-
+            const loadingId = appendMessage("Je réfléchit...", 'agent');
             try {
                 const response = await fetch(WORKER_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: messageText })
+                    body: JSON.stringify({ message: messageText,
+                 historique: coherence() })
                 });
-                
                 const data = await response.json();
-                
-                // Remplacer le chargement par la vraie réponse nettoyée
                 document.getElementById(loadingId).innerText = data.response;
             } catch (error) {
                 document.getElementById(loadingId).innerText = "Erreur de connexion avec l'agent.";
@@ -62,13 +54,29 @@
         function appendMessage(text, sender) {
             const container = document.getElementById('chat-container');
             const messageDiv = document.createElement('div');
-            const id = 'msg-' + Date.now();
-            messageDiv.id = id;
-            messageDiv.className = `message ${sender}`;
+            const timestamp = Date.now();
+
+            messageDiv.id = 'msg-' + sender + '-' + timestamp;
+
+            messageDiv.dataset.time = timestamp;
+            
+            messageDiv.className = 'message ' + sender;
             messageDiv.innerText = text;
             container.appendChild(messageDiv);
             container.scrollTop = container.scrollHeight;
-            return id;
+            return messageDiv.id;
+        }
+        
+        function coherence(){
+            const MESSAGES = Array.from(document.querySelectorAll('.message')).sort((a, b) => {
+                    return b.dataset.time - a.dataset.time;
+            });
+            
+            if(MESSAGES.length<=2) return "";
+            
+            const texteMessages = MESSAGES.slice(2, 17).map(div => div.textContent).reverse().join(' | ');
+
+            return "Voici nos précédents échanges dans l'ordre chronologique pour t'aider à avoir une cohérence : " + texteMessages;
         }
     </script>
 </body>
