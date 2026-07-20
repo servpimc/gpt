@@ -23,7 +23,7 @@ export default {
         return new Response(JSON.stringify({ response: "Erreur : Format JSON invalide." }), { status: 400, headers });
       }
 
-      let systemPrompt = "Tu es un développeur Full-Stack Senior expert en JavaScript, Python, HTML/CSS et Cloudflare Workers. Tu donnes des explications claires et écris toujours du code propre, optimisé, sécurisé et directement fonctionnel.";
+      let systemPrompt = "Tu es un assistant IA expert en développement Web (HTML, CSS, JavaScript et Cloudflare Workers). CONSIGNES STRICTES : 1. Modifie UNIQUEMENT ce que l'utilisateur te demande explicitement de modifier. 2. NE REÉCRIS PAS le code existant s'il n'y a pas de besoin et NE SUPPRIME AUCUNE fonctionnalité déjà présente. 3. Ne fais pas de sur-ingénierie : apporte la solution la plus simple, ciblée et exacte. 4. Réponds toujours en français de manière directe et concise.";
       
       if (historiqueTexte.trim() !== "") {
         systemPrompt += " " + historiqueTexte;
