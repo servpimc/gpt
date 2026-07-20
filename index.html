@@ -41,7 +41,8 @@
                 const response = await fetch(WORKER_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: messageText })
+                    body: JSON.stringify({ message: messageText,
+                 historique: coherence() })
                 });
                 const data = await response.json();
                 document.getElementById(loadingId).innerText = data.response;
@@ -53,14 +54,29 @@
         function appendMessage(text, sender) {
             const container = document.getElementById('chat-container');
             const messageDiv = document.createElement('div');
-            const id = 'msg-' + sender + '-' + Date.now(); 
+            const timestamp = Date.now();
+
+            messageDiv.id = 'msg-' + sender + '-' + timestamp;
+
+            messageDiv.dataset.time = timestamp;
             
-            messageDiv.id = id;
             messageDiv.className = 'message ' + sender;
             messageDiv.innerText = text;
             container.appendChild(messageDiv);
             container.scrollTop = container.scrollHeight;
-            return id;
+            return messageDiv.id;
+        }
+        
+        function coherence(){
+            const MESSAGES = Array.from(document.querySelectorAll('.message')).sort((a, b) => {
+                    return b.dataset.time - a.dataset.time;
+            });
+            
+            if(MESSAGES.length<=2) return "";
+            
+            const texteMessages = MESSAGES.slice(2, 17).map(div => div.textContent).reverse().join(' | ');
+
+            return "Voici nos précédents échanges dans l'ordre chronologique pour t'aider à avoir une cohérence : " + texteMessages;
         }
     </script>
 </body>
