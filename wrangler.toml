@@ -1,5 +1,0 @@
-name = "agent-ia"
-main = "worker.js" # ou le nom exact de ton fichier JS
-compatibility_date = "2026-07-20"
-
-[compatibility_flags]
