@@ -18,13 +18,12 @@ export default {
       try {
         const body = await request.json();
         userMessage = body.message || "Dis bonjour";
-        historiqueTexte = body.historique || ""; // On récupère l'historique envoyé par le front-end
+        historiqueTexte = body.historique || "";
       } catch (e) {
         return new Response(JSON.stringify({ response: "Erreur : Format JSON invalide." }), { status: 400, headers });
       }
 
-      // Construction du message système avec l'historique s'il existe
-      let systemPrompt = "Tu es un agent IA de poche ultra-intelligent. Tu réponds toujours en français de la manière la plus précise et concise possible.";
+      let systemPrompt = "Tu es un développeur Full-Stack Senior expert en JavaScript, Python, HTML/CSS et Cloudflare Workers. Tu donnes des explications claires et écris toujours du code propre, optimisé, sécurisé et directement fonctionnel.";
       
       if (historiqueTexte.trim() !== "") {
         systemPrompt += " " + historiqueTexte;
