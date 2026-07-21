@@ -29,8 +29,11 @@ export default {
         systemPrompt += " " + historiqueTexte;
       }
 
+      let textResult = "";
+
       try {
-        const aiResponse = await env.AI.run("a@cf/meta/llama-4-scout-17b-16e-instruct", {
+        // Tentative 1 : Workers AI
+        const aiResponse = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
           max_tokens: 4096,
           messages: [
             { role: "system", content: systemPrompt },
@@ -38,7 +41,6 @@ export default {
           ]
         });
 
-        let textResult = "";
         if (aiResponse && aiResponse.response) {
           textResult = aiResponse.response;
         } else if (aiResponse && aiResponse.result) {
@@ -47,47 +49,48 @@ export default {
           textResult = typeof aiResponse === 'string' ? aiResponse : JSON.stringify(aiResponse);
         }
 
-        return new Response(JSON.stringify({ response: textResult }), { headers });
-
       } catch (erreurCloudflare) {
-      console.log("Cloudflare a échoué/bloqué, bascule sur Groq...", erreurCloudflare);
+        console.log("Cloudflare a échoué/bloqué, bascule sur Groq...", erreurCloudflare);
 
-      try {
-        reponseTexte = await appelerGroq(prompt, env);
-
-      } catch (erreurGroq) {
-        console.log("Groq a également échoué:", erreurGroq);
-        reponseTexte = "Désolé, les services d'IA sont indisponibles pour le moment.";
+        try {
+          // Tentative 2 : Fallback sur Groq
+          textResult = await appelerGroq(userMessage, systemPrompt, env);
+        } catch (erreurGroq) {
+          console.log("Groq a également échoué:", erreurGroq);
+          textResult = "Désolé, les services d'IA sont indisponibles pour le moment.";
+        }
       }
-    }
+
+      return new Response(JSON.stringify({ response: textResult }), { headers });
     }
 
     return new Response(JSON.stringify({ error: "Ce Worker n'attend que des requêtes POST." }), { status: 405, headers });
-  
-    async function appelerGroq(prompt, env) {
-    const response = await fetch(`https://api.groq.com/v1/queries?apiKey=${env.grok_api}`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer   ${env.grok_api}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model:"llama-3.1-8b-instant",
-        messages: [
-          { role: "user", content: prompt }
-        ],
-        max_tokens: 2048
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Erreur Groq: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data.choices[0].message.content;
-  }
-
-    
   }
 };
+
+// Fonction helper déplacée en dehors de l'objet principal
+async function appelerGroq(userMessage, systemPrompt, env) {
+  const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${env.grok_api}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: "llama-3.1-8b-instant",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userMessage }
+      ],
+      max_tokens: 2048
+    })
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Erreur Groq (${response.status}): ${errorText}`);
+  }
+
+  const data = await response.json();
+  return data.choices[0].message.content;
+}
