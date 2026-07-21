@@ -30,7 +30,7 @@ export default {
       }
 
       try {
-        const aiResponse = await env.AI.run("@cf/meta/llama-4-scout-17b-16e-instruct", {
+        const aiResponse = await env.AI.run("a@cf/meta/llama-4-scout-17b-16e-instruct", {
           max_tokens: 4096,
           messages: [
             { role: "system", content: systemPrompt },
@@ -68,7 +68,7 @@ export default {
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer   ${env.grok_api}`, // Récupère ton secret Cloudflare
+        "Authorization": `Bearer   ${env.grok_api}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
