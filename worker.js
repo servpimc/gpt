@@ -30,7 +30,7 @@ export default {
       }
 
       try {
-        const aiResponse = await env.AI.run("a@cf/meta/llama-4-scout-17b-16e-instruct", {
+        const aiResponse = await env.AI.run("@cf/meta/llama-4-scout-17b-16e-instruct", {
           max_tokens: 4096,
           messages: [
             { role: "system", content: systemPrompt },
@@ -65,14 +65,14 @@ export default {
     return new Response(JSON.stringify({ error: "Ce Worker n'attend que des requêtes POST." }), { status: 405, headers });
   
     async function appelerGroq(prompt, env) {
-    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    const response = await fetch(`https://api.groq.com/v1/queries?apiKey=${env.grok_api}`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer   ${env.grok_api}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "llama-3.1-8b-instant",
+        model="llama-3.1-8b-instant",
         messages: [
           { role: "user", content: prompt }
         ],
