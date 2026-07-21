@@ -1,4 +1,4 @@
-name = "agent-ia"
+name = "gpt"
 main = "worker.js" # ou le nom exact de ton fichier JS
 compatibility_date = "2026-07-20"
 [ai]
