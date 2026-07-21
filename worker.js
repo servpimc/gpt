@@ -63,5 +63,31 @@ export default {
     }
 
     return new Response(JSON.stringify({ error: "Ce Worker n'attend que des requêtes POST." }), { status: 405, headers });
+  
+    async function appelerGroq(prompt, env) {
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer   ${env.grok_api}`, // Récupère ton secret Cloudflare
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "llama-3.1-8b-instant",
+        messages: [
+          { role: "user", content: prompt }
+        ],
+        max_tokens: 2048
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erreur Groq: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.choices[0].message.content;
+  }
+
+    
   }
 };
