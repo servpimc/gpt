@@ -32,8 +32,7 @@ export default {
       let textResult = "";
 
       try {
-        // Tentative 1 : Workers AI
-        const aiResponse = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
+        const aiResponse = await env.AI.run("a@cf/meta/llama-3.1-8b-instruct", {
           max_tokens: 4096,
           messages: [
             { role: "system", content: systemPrompt },
@@ -53,7 +52,6 @@ export default {
         console.log("Cloudflare a échoué/bloqué, bascule sur Groq...", erreurCloudflare);
 
         try {
-          // Tentative 2 : Fallback sur Groq
           textResult = await appelerGroq(userMessage, systemPrompt, env);
         } catch (erreurGroq) {
           console.log("Groq a également échoué:", erreurGroq);
@@ -68,7 +66,6 @@ export default {
   }
 };
 
-// Fonction helper déplacée en dehors de l'objet principal
 async function appelerGroq(userMessage, systemPrompt, env) {
   const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
@@ -82,7 +79,7 @@ async function appelerGroq(userMessage, systemPrompt, env) {
         { role: "system", content: systemPrompt },
         { role: "user", content: userMessage }
       ],
-      max_tokens: 2048
+      max_tokens: 4096
     })
   });
 
