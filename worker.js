@@ -30,7 +30,7 @@ export default {
       }
 
       try {
-        const aiResponse = await env.AI.run("@cf/meta/llama-4-scout-17b-16e-instruct", {
+        const aiResponse = await env.AI.run("a@cf/meta/llama-4-scout-17b-16e-instruct", {
           max_tokens: 4096,
           messages: [
             { role: "system", content: systemPrompt },
@@ -49,9 +49,17 @@ export default {
 
         return new Response(JSON.stringify({ response: textResult }), { headers });
 
-      } catch (error) {
-        return new Response(JSON.stringify({ response: "Erreur IA : " + error.message }), { headers });
+      } catch (erreurCloudflare) {
+      console.log("Cloudflare a échoué/bloqué, bascule sur Groq...", erreurCloudflare);
+
+      try {
+        reponseTexte = await appelerGroq(prompt, env);
+
+      } catch (erreurGroq) {
+        console.log("Groq a également échoué:", erreurGroq);
+        reponseTexte = "Désolé, les services d'IA sont indisponibles pour le moment.";
       }
+    }
     }
 
     return new Response(JSON.stringify({ error: "Ce Worker n'attend que des requêtes POST." }), { status: 405, headers });
