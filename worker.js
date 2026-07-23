@@ -39,9 +39,11 @@ export default {
             { role: "user", content: userMessage }
           ]
         });
-
+        
+        aiResponse.model = "Llama 4";
+        
         if (aiResponse && aiResponse.response) {
-          textResult = aiResponse.response;
+          textResult = aiResponse.model +" : "+ aiResponse.response;
         } else if (aiResponse && aiResponse.result) {
           textResult = aiResponse.result;
         } else {
