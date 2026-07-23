@@ -45,7 +45,7 @@ export default {
         } else if (aiResponse && aiResponse.result) {
           textResult = aiResponse.result;
         } else {
-          textResult = typeof aiResponse === 'string' ? aiResponse : JSON.stringify(aiResponse);
+          appelerGroq(userMessage, systemPrompt, env);
         }
 
       } catch (erreurCloudflare) {
