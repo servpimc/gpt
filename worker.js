@@ -32,7 +32,7 @@ export default {
       let textResult = "";
 
       try {
-        const aiResponse = await env.AI.run("a@cf/meta/llama-4-scout-17b-16e-instruct", {
+        const aiResponse = await env.AI.run("@cf/meta/llama-4-scout-17b-16e-instruct", {
           max_tokens: 4096,
           messages: [
             { role: "system", content: systemPrompt },
