@@ -1,1 +1,10 @@
-"start": "node index.js"
+{
+  "name": "gpt",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    ...
+  }
+}   
