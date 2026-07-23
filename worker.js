@@ -40,10 +40,8 @@ export default {
           ]
         });
         
-        aiResponse.model = "Llama 4";
-        
         if (aiResponse && aiResponse.response) {
-          textResult = aiResponse.model +" : "+ aiResponse.response;
+          textResult = "Llama 4 : "+ aiResponse.response;
         } else if (aiResponse && aiResponse.result) {
           textResult = aiResponse.result;
         } else {
@@ -91,5 +89,5 @@ async function appelerGroq(userMessage, systemPrompt, env) {
   }
 
   const data = await response.json();
-  return data.choices[0].message.content;
+  return "Llama3.1-8b : "+data.choices[0].message.content;
 }
