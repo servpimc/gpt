@@ -45,7 +45,7 @@ export default {
         } else if (aiResponse && aiResponse.result) {
           textResult = aiResponse.result;
         } else {
-          appelerGroq(userMessage, systemPrompt, env);
+          textResult = await appelerGroq(userMessage, systemPrompt, env);
         }
 
       } catch (erreurCloudflare) {
