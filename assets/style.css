@@ -69,7 +69,7 @@ button:hover { background: #e06d10; }
 
 .logo-model {
   display: inline-block;    /* Permet de rester sur la même ligne */
-  height: 1.2em;            /* S'adapte automatiquement à la taille du texte */
+  height: 60px;            /* S'adapte automatiquement à la taille du texte */
   width: auto;              /* Conserve le ratio de l'image */
   vertical-align: middle;   /* Aligne l'image au milieu du texte */
   margin-right: 6px;        /* Ajoute une petite marge à droite */
