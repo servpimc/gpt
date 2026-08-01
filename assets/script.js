@@ -18,6 +18,39 @@ function getOrCreateChatId() {
     return chatId;
 }
 
+function parseJwt(token) {
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+    } catch (e) {
+        console.error("Erreur de décodage du token Google:", e);
+        return null;
+    }
+}
+
+function handleCredentialResponse(response) {
+    const payload = parseJwt(response.credential);
+    
+    if (payload && payload.email) {
+        userEmail = payload.email; // Extrait "servpimc@gmail.com"
+        console.log("Email récupéré avec succès :", userEmail);
+    } else {
+        console.warn("Impossible de récupérer l'email depuis le token.");
+    }
+
+    document.getElementById("msg-agent-0").innerText = "Bienvenue ! Que puis-je faire pour vous ?";
+    document.getElementById("auth-bar").style.display = "none";
+    document.getElementById("overlay").style.display = "none";
+    document.getElementById("user-input").disabled = false;
+    
+    const sendBtn = document.querySelector('button');
+    if (sendBtn) sendBtn.disabled = false;
+}
+
 async function sendMessage() {
     const input = document.getElementById('user-input');
     const messageText = input.value.trim();
@@ -28,21 +61,27 @@ async function sendMessage() {
 
     const loadingId = appendMessage("Je réfléchis...", 'agent');
     
+    const payload = { 
+        message: messageText,
+        userEmail: userEmail || "invite@gmail.com",
+        chatId: getOrCreateChatId()
+    };
+
     try {
         const response = await fetch(WORKER_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                message: messageText,
-                userEmail: userEmail || "utilisateur_inconnu@gmail.com",
-                chatId: getOrCreateChatId()
-            })
+            body: JSON.stringify(payload)
         });
         
         const data = await response.json();
         
-        const formattedHtml = marked.parse(data.response);
-        document.getElementById(loadingId).innerHTML = formattedHtml;
+        if (response.ok && data.response) {
+            const formattedHtml = marked.parse(data.response);
+            document.getElementById(loadingId).innerHTML = formattedHtml;
+        } else {
+            document.getElementById(loadingId).innerText = data.response || data.error || "Erreur 400 transmise par le serveur.";
+        }
 
     } catch (error) {
         document.getElementById(loadingId).innerText = "Erreur de connexion avec l'agent.";
@@ -69,27 +108,6 @@ function appendMessage(text, sender) {
     container.appendChild(messageDiv);
     container.scrollTop = container.scrollHeight;
     return messageDiv.id;
-}
-
-function parseJwt(token) {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
-    return JSON.parse(jsonPayload);
-}
-
-function handleCredentialResponse(response) {
-    const payload = parseJwt(response.credential);
-    userEmail = payload.email;
-    console.log("Utilisateur connecté :", userEmail);
-
-    document.getElementById("msg-agent-0").innerText = "Bienvenue ! Que puis-je faire pour vous ?";
-    document.getElementById("auth-bar").style.display = "none";
-    document.getElementById("overlay").style.display = "none";
-    document.getElementById("user-input").disabled = false;
-    document.querySelectorAll('button')[0].disabled = false;
 }
 
 window.onload = function () {
