@@ -8,5 +8,5 @@ export async function appelerCloudflareAI(userMessage, systemPrompt, env) {
           ]
         });
         
-        return "<img src='./assets/img/llama4.png'>"+ aiResponse.response || aiResponse.result;
+        return "<img class='logo-model' src='./assets/img/llama4.png'>"+ aiResponse.response || aiResponse.result;
 }
