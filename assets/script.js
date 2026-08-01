@@ -1,13 +1,22 @@
 const WORKER_URL = "https://agent-ia.servpimc.workers.dev/"; 
-let userTokenGoogle = null;
+let userEmail = null;
 
 marked.setOptions({
     highlight: function(code, lang) {
-        const language = highlight.js.getLanguage(lang) ? lang : 'plaintext';
-        return highlight.js.highlight(code, { language }).value;
+        const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+        return hljs.highlight(code, { language }).value;
     },
     langPrefix: 'hljs language-'
 });
+
+function getOrCreateChatId() {
+    let chatId = sessionStorage.getItem("current_chat_id");
+    if (!chatId) {
+        chatId = "chat_" + crypto.randomUUID();
+        sessionStorage.setItem("current_chat_id", chatId);
+    }
+    return chatId;
+}
 
 async function sendMessage() {
     const input = document.getElementById('user-input');
@@ -25,8 +34,8 @@ async function sendMessage() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 message: messageText,
-                historique: coherence(),
-                tokenGoogle: userTokenGoogle
+                userEmail: userEmail || "utilisateur_inconnu@gmail.com",
+                chatId: getOrCreateChatId()
             })
         });
         
@@ -49,7 +58,6 @@ function appendMessage(text, sender) {
     const timestamp = Date.now();
 
     messageDiv.id = 'msg-' + sender + '-' + timestamp;
-    messageDiv.dataset.time = timestamp;
     messageDiv.className = 'message ' + sender;
 
     if (sender === 'user') {
@@ -63,25 +71,23 @@ function appendMessage(text, sender) {
     return messageDiv.id;
 }
 
-function coherence() {
-    const MESSAGES = Array.from(document.querySelectorAll('.message')).sort((a, b) => {
-        return b.dataset.time - a.dataset.time;
-    });
-    
-    if (MESSAGES.length <= 2) return "";
-    
-    const texteMessages = MESSAGES.slice(2, 17).map(div => div.textContent).reverse().join(' | ');
-
-    return "Voici nos précédents échanges dans l'ordre chronologique pour t'aider à avoir une cohérence : " + texteMessages;
+function parseJwt(token) {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
 }
 
 function handleCredentialResponse(response) {
-    userTokenGoogle = response.credential;
-    console.log("Utilisateur connecté ! Token :", userTokenGoogle);
+    const payload = parseJwt(response.credential);
+    userEmail = payload.email;
+    console.log("Utilisateur connecté :", userEmail);
 
-    document.getElementById("msg-agent-0").innerText= "Bienvenue ! Que puis-je faire pour vous?";
-    document.getElementById("auth-bar").style.display="none";
-    document.getElementById("overlay").style.display="none";
+    document.getElementById("msg-agent-0").innerText = "Bienvenue ! Que puis-je faire pour vous ?";
+    document.getElementById("auth-bar").style.display = "none";
+    document.getElementById("overlay").style.display = "none";
     document.getElementById("user-input").disabled = false;
     document.querySelectorAll('button')[0].disabled = false;
 }
@@ -96,4 +102,9 @@ window.onload = function () {
         document.getElementById("google-btn"),
         { theme: "filled_blue", size: "medium" }
     );
+}
+
+function nouveauChat() {
+    sessionStorage.removeItem("current_chat_id");
+    document.getElementById("chat-container").innerHTML = "";
 }
