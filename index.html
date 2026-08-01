@@ -150,6 +150,7 @@
             console.log("Utilisateur connecté ! Token :", userTokenGoogle);
 
             appendMessage("Connexion réussie ! Vous pouvez maintenant utiliser l'IA.", 'agent');
+            document.getElementById("auth-bar").style.display="none";
         }
 
         window.onload = function () {
