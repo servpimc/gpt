@@ -1,3 +1,6 @@
+import { appelerCloudflareAI } from './agents/cloudflare.js';
+import { appelerGroq } from './agents/groq.js';
+
 export default {
   async fetch(request, env) {
     const headers = {
@@ -14,6 +17,8 @@ export default {
     if (request.method === "POST") {
       let userMessage = "";
       let historiqueTexte = "";
+      let textResult = "";
+      let systemPrompt = "Tu es un assistant IA expert en développement Web (HTML, CSS, JavaScript et Cloudflare Workers). CONSIGNES STRICTES : 1. Modifie UNIQUEMENT ce que l'utilisateur te demande explicitement de modifier. 2. NE REÉCRIS PAS le code existant s'il n'y a pas de besoin et NE SUPPRIME AUCUNE fonctionnalité déjà présente. 3. Ne fais pas de sur-ingénierie : apporte la solution la plus simple, ciblée et exacte. 4. Réponds toujours en français de manière directe et concise.";
 
       try {
         const body = await request.json();
@@ -23,34 +28,13 @@ export default {
         return new Response(JSON.stringify({ response: "Erreur : Format JSON invalide." }), { status: 400, headers });
       }
 
-      let systemPrompt = "Tu es un assistant IA expert en développement Web (HTML, CSS, JavaScript et Cloudflare Workers). CONSIGNES STRICTES : 1. Modifie UNIQUEMENT ce que l'utilisateur te demande explicitement de modifier. 2. NE REÉCRIS PAS le code existant s'il n'y a pas de besoin et NE SUPPRIME AUCUNE fonctionnalité déjà présente. 3. Ne fais pas de sur-ingénierie : apporte la solution la plus simple, ciblée et exacte. 4. Réponds toujours en français de manière directe et concise.";
-      
       if (historiqueTexte.trim() !== "") {
         systemPrompt += " " + historiqueTexte;
       }
 
-      let textResult = "";
-
       try {
-        const aiResponse = await env.AI.run("@cf/meta/llama-4-scout-17b-16e-instruct", {
-          max_tokens: 4096,
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userMessage }
-          ]
-        });
-        
-        if (aiResponse && aiResponse.response) {
-          textResult = "Llama 4 : "+ aiResponse.response;
-        } else if (aiResponse && aiResponse.result) {
-          textResult = aiResponse.result;
-        } else {
-          textResult = await appelerGroq(userMessage, systemPrompt, env);
-        }
-
+        textResult = await appelerCloudflareAI(userMessage, systemPrompt, env);
       } catch (erreurCloudflare) {
-        console.log("Cloudflare a échoué/bloqué, bascule sur Groq...", erreurCloudflare);
-
         try {
           textResult = await appelerGroq(userMessage, systemPrompt, env);
         } catch (erreurGroq) {
@@ -65,29 +49,3 @@ export default {
     return new Response(JSON.stringify({ error: "Ce Worker n'attend que des requêtes POST." }), { status: 405, headers });
   }
 };
-
-async function appelerGroq(userMessage, systemPrompt, env) {
-  const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${env.grok_api}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      model: "llama-3.1-8b-instant",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userMessage }
-      ],
-      max_tokens: 4096
-    })
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Erreur Groq (${response.status}): ${errorText}`);
-  }
-
-  const data = await response.json();
-  return "Llama3.1-8b : "+data.choices[0].message.content;
-}
