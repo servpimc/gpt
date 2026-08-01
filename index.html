@@ -9,47 +9,9 @@
     
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #131314; color: #e3e3e3; margin: 0; display: flex; flex-direction: column; height:100dvh; }
-        
-        /* En-tête pour le bouton de connexion */
-        #auth-bar { padding: 10px 20px; background: #1e1f20; border-bottom: 1px solid #444746; display: flex; justify-content: flex-end; align-items: center; }
-        
-        #chat-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .message { padding: 12px 16px; border-radius: 12px; max-width: 75%; word-wrap: break-word; line-height: 1.5; }
-        .user { background: #2b2a2a; align-self: flex-end; color: #fff; }
-        .agent { background: #1e1f20; align-self: flex-start; border: 1px solid #444746; }
-        #input-container { padding: 20px; background: #131314; display: flex; gap: 10px; }
-        input { flex: 1; padding: 16px; border-radius: 24px; border: 1px solid #444746; background: #1e1f20; color: #fff; font-size: 16px; outline: none; }
-        button { background: #f38020; color: #000; border: none; padding: 0 24px; border-radius: 24px; font-weight: bold; cursor: pointer; font-size: 16px; }
-        button:hover { background: #e06d10; }
-
-        /* Styles Markdown & Code */
-        .agent p { margin: 0 0 10px 0; }
-        .agent p:last-child { margin-bottom: 0; }
-        
-        .agent pre {
-            background: #0d1117;
-            padding: 12px;
-            border-radius: 8px;
-            overflow-x: auto;
-            border: 1px solid #30363d;
-            margin: 10px 0;
-        }
-
-        .agent code {
-            font-family: 'Fira Code', 'Consolas', Monaco, monospace;
-            font-size: 0.9em;
-        }
-
-        .agent :not(pre) > code {
-            background: #2d2d2d;
-            padding: 2px 6px;
-            border-radius: 4px;
-            color: #f38020;
-        }
-    </style>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="./assets/script.js"></script>
+    <link rel="stylesheet" href="./assets/style.css">
 </head>
 <body>
 
@@ -58,112 +20,13 @@
     </div>
 
     <div id="chat-container">
-        <div class="message agent">Bienvenue ! Connectez-vous avec Google pour démarrer et enregistrer votre historique.</div>
+        <div id="msg-agent-0" class="message agent">Bienvenue ! Connectez-vous avec Google pour démarrer une conversation.</div>
     </div>
 
     <div id="input-container">
-        <input type="text" id="user-input" placeholder="Écris ton message ici..." onkeypress="if(event.key === 'Enter') sendMessage()">
-        <button onclick="sendMessage()">Envoyer</button>
+        <input disabled="true" type="text" id="user-input" placeholder="Écris ton message ici..." onkeypress="if(event.key === 'Enter') sendMessage()">
+        <button disabled="true" onclick="sendMessage()">Envoyer</button>
     </div>
 
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script>
-        const WORKER_URL = "https://agent-ia.servpimc.workers.dev/"; 
-        let userTokenGoogle = null;
-
-        marked.setOptions({
-            highlight: function(code, lang) {
-                const language = highlight.js.getLanguage(lang) ? lang : 'plaintext';
-                return highlight.js.highlight(code, { language }).value;
-            },
-            langPrefix: 'hljs language-'
-        });
-
-        async function sendMessage() {
-            const input = document.getElementById('user-input');
-            const messageText = input.value.trim();
-            if (!messageText) return;
-
-            appendMessage(messageText, 'user');
-            input.value = '';
-
-            const loadingId = appendMessage("Je réfléchis...", 'agent');
-            
-            try {
-                const response = await fetch(WORKER_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        message: messageText,
-                        historique: coherence(),
-                        tokenGoogle: userTokenGoogle
-                    })
-                });
-                
-                const data = await response.json();
-                
-                const formattedHtml = marked.parse(data.response);
-                document.getElementById(loadingId).innerHTML = formattedHtml;
-
-            } catch (error) {
-                document.getElementById(loadingId).innerText = "Erreur de connexion avec l'agent.";
-            }
-
-            const container = document.getElementById('chat-container');
-            container.scrollTop = container.scrollHeight;
-        }
-
-        function appendMessage(text, sender) {
-            const container = document.getElementById('chat-container');
-            const messageDiv = document.createElement('div');
-            const timestamp = Date.now();
-
-            messageDiv.id = 'msg-' + sender + '-' + timestamp;
-            messageDiv.dataset.time = timestamp;
-            messageDiv.className = 'message ' + sender;
-
-            if (sender === 'user') {
-                messageDiv.innerText = text;
-            } else {
-                messageDiv.innerHTML = text;
-            }
-
-            container.appendChild(messageDiv);
-            container.scrollTop = container.scrollHeight;
-            return messageDiv.id;
-        }
-        
-        function coherence() {
-            const MESSAGES = Array.from(document.querySelectorAll('.message')).sort((a, b) => {
-                return b.dataset.time - a.dataset.time;
-            });
-            
-            if (MESSAGES.length <= 2) return "";
-            
-            const texteMessages = MESSAGES.slice(2, 17).map(div => div.textContent).reverse().join(' | ');
-
-            return "Voici nos précédents échanges dans l'ordre chronologique pour t'aider à avoir une cohérence : " + texteMessages;
-        }
-
-        function handleCredentialResponse(response) {
-            userTokenGoogle = response.credential;
-            console.log("Utilisateur connecté ! Token :", userTokenGoogle);
-
-            appendMessage("Connexion réussie ! Vous pouvez maintenant utiliser l'IA.", 'agent');
-            document.getElementById("auth-bar").style.display="none";
-        }
-
-        window.onload = function () {
-            google.accounts.id.initialize({
-                client_id: "912599571029-n8top69090f7vvnf661pmamb41i6j977.apps.googleusercontent.com",
-                callback: handleCredentialResponse
-            });
-            
-            google.accounts.id.renderButton(
-                document.getElementById("google-btn"),
-                { theme: "filled_blue", size: "medium" }
-            );
-        }
-    </script>
 </body>
 </html>
