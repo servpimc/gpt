@@ -81,6 +81,7 @@ function handleCredentialResponse(response) {
 
     document.getElementById("msg-agent-0").innerText= "Bienvenue ! Que puis-je faire pour vous?";
     document.getElementById("auth-bar").style.display="none";
+    document.getElementById("overlay").style.display="none";
     document.getElementById("user-input").disabled = false;
     document.querySelectorAll('button')[0].disabled = false;
 }
