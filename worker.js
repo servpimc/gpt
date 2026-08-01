@@ -28,17 +28,16 @@ export default {
         return new Response(JSON.stringify({ response: "Erreur : Format JSON invalide." }), { status: 400, headers });
       }
 
-      if (historiqueTexte.trim() !== "") {
-        systemPrompt += " " + historiqueTexte;
-      }
+      if (historiqueTexte.trim()) systemPrompt += " " + historiqueTexte;
 
       try {
         textResult = await appelerCloudflareAI(userMessage, systemPrompt, env);
       } catch (erreurCloudflare) {
+        console.error("llama4 à échoué:", erreurCloudflare);
         try {
           textResult = await appelerGroq(userMessage, systemPrompt, env);
         } catch (erreurGroq) {
-          console.log("Groq a également échoué:", erreurGroq);
+          console.error("Groq a également échoué:", erreurGroq);
           textResult = "Désolé, les services d'IA sont indisponibles pour le moment.";
         }
       }

@@ -2,7 +2,7 @@ export async function appelerGroq(userMessage, systemPrompt, env) {
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${env.grok_api}`,
+      "Authorization": `Bearer ${env.groq_api}`,
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
