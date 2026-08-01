@@ -21,5 +21,5 @@ export async function appelerGroq(userMessage, systemPrompt, env) {
   }
 
   const data = await response.json();
-  return "Llama3.1-8b : "+data.choices[0].message.content;
+  return "<img src='./assets/img/llama3.png'>"+data.choices[0].message.content;
 }
