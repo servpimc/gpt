@@ -40,7 +40,7 @@ function handleCredentialResponse(response) {
         console.log("Email récupéré avec succès :", userEmail);
         document.getElementById("msg-agent-0").innerText = "Bienvenue ! Que puis-je faire pour vous ?";
         document.getElementById('google').close();
-        loadChatHistory(userEmail)
+        
     } else {
         console.warn("Impossible de récupérer l'email depuis le token.");
         document.getElementById("google_h2").innerText = "Une erreur est survenue";
