@@ -1,25 +1,39 @@
 export async function appelerGemini(userMessage, systemPrompt, env) {
-  const response = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
+  if (!env.gemini_api) {
+    throw new Error("La variable d'environnement 'gemini_api' est manquante sur Cloudflare.");
+  }
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${env.gemini_api}`;
+
+  const response = await fetch(url, {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${env.gemini_api}`,
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      model: "gemini-2.5-flash",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userMessage }
-      ],
-      max_tokens: 4096
+      system_instruction: {
+        parts: [{ text: systemPrompt }]
+      },
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: userMessage }]
+        }
+      ]
     })
   });
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Erreur Gemini (${response.status}): ${errorText}`);
+    throw new Error(`Erreur API Gemini (${response.status}): ${errorText}`);
   }
 
   const data = await response.json();
-  return "<img class='logo-model' src='./assets/img/gemini.svg'>" + data.choices[0].message.content;
+  
+  // Extraction de la réponse du format natif Google
+  if (data.candidates && data.candidates[0].content.parts[0].text) {
+    return "<img class='logo-model' src='./assets/img/gemini.svg'>" + data.candidates[0].content.parts[0].text;
+  }
+
+  throw new Error("Réponse vide de la part de Gemini.");
 }
