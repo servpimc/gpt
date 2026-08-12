@@ -48,9 +48,11 @@ function handleCredentialResponse(response) {
 
 }
 
-async function sendMessage(model) {
+async function sendMessage() {
     const input = document.getElementById('user-input');
     const messageText = input.value.trim();
+    const modelSelect = document.getElementById('model-select');
+    const selectedModel = modelSelect ? modelSelect.value : 'llama';
     if (!messageText) return;
 
     appendMessage(messageText, 'user');
@@ -62,7 +64,7 @@ async function sendMessage(model) {
         message: messageText,
         userEmail: userEmail || "invite@gmail.com",
         chatId: getOrCreateChatId(),
-        model: model
+        model: selectedModel
     };
 
     try {
