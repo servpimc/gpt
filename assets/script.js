@@ -112,7 +112,7 @@ function appendMessage(text, sender) {
 
 window.onload = function () {
     google.accounts.id.initialize({
-        client_id: "912599571029-n8top69090f7vvnf661pmamb41i6j977.apps.googleusercontent.com",
+        client_id: "916642879878-hnvhqevu24dsm6inmbv1ikdfie1vs02a.apps.googleusercontent.com",
         callback: handleCredentialResponse
     });
     
