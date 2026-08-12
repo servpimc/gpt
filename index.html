@@ -3,32 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IA quoi maintenan</title>
+    <title>IA quoi maintenant</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script src="./assets/script.js"></script>
-    <script src="./assets/history.js"></script>
+    <script defer src="./assets/script.js"></script>
+    <script defer src="./assets/history.js"></script>
     <link rel="stylesheet" href="./assets/style.css">
 </head>
 <body>
-
-    <div id="auth-bar">
+    <dialog id="google">
+        <h2 id="google-h2">Connectez-vous à Google</h2>
         <div id="google-btn"></div>
-    </div>
-    <div id="overlay"></div>
+    </dialog>
 
-    <div id="chat-container">
-        <div id="msg-agent-0" class="message agent">Bienvenue ! Connectez-vous avec Google pour démarrer une conversation.</div>
+    <nav id="sidebar">
+        <button id="toggle-sidebar" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+        <ul id="container-chanel">
+        <li><a href="#">Accueil</a></li>
+        <li><a href="#">Projets</a></li>
+        <li><a href="#">Contact</a></li>
+        </ul>
+    </nav>
+    <div id="content">
+        <div class="card" id="chat-container">
+            <h2 id="title-chat">Utilisation CPU</h2>
+            <div id="msg-agent-0" class="message agent">Bienvenue ! Connectez-vous avec Google pour démarrer une conversation.</div>
+        </div>
+        
+        <div class="card" id="input-container">
+            <input type="text" id="user-input" placeholder="Écris ton message ici..." onkeypress="if(event.key === 'Enter') sendMessage(document.getElementById('model-select').value)">
+            <select name="model" id="model-select">
+                <option value="llama">llama 3.1-8b</option>
+                <option value="gemini">gemini 2.5 flash</option>
+            </select>
+            <button onclick="sendMessage(document.getElementById('model-select').value)">⌲</button>
+        </div>
+        
     </div>
-
-    <div id="input-container">
-        <input disabled="true" type="text" id="user-input" placeholder="Écris ton message ici..." onkeypress="if(event.key === 'Enter') sendMessage()">
-        <button disabled="true" onclick="sendMessage()">Envoyer</button>
-    </div>
-
+    
 </body>
 </html>

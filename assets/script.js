@@ -36,22 +36,19 @@ function handleCredentialResponse(response) {
     const payload = parseJwt(response.credential);
     
     if (payload && payload.email) {
-        userEmail = payload.email; // Extrait "servpimc@gmail.com"
+        userEmail = payload.email;
         console.log("Email récupéré avec succès :", userEmail);
+        document.getElementById("msg-agent-0").innerText = "Bienvenue ! Que puis-je faire pour vous ?";
+        document.getElementById('google').close();
+        loadChatHistory(userEmail)
     } else {
         console.warn("Impossible de récupérer l'email depuis le token.");
+        document.getElementById("google_h2").innerText = "Une erreur est survenue";
     }
 
-    document.getElementById("msg-agent-0").innerText = "Bienvenue ! Que puis-je faire pour vous ?";
-    document.getElementById("auth-bar").style.display = "none";
-    document.getElementById("overlay").style.display = "none";
-    document.getElementById("user-input").disabled = false;
-    
-    const sendBtn = document.querySelector('button');
-    if (sendBtn) sendBtn.disabled = false;
 }
 
-async function sendMessage() {
+async function sendMessage(model) {
     const input = document.getElementById('user-input');
     const messageText = input.value.trim();
     if (!messageText) return;
@@ -64,7 +61,8 @@ async function sendMessage() {
     const payload = { 
         message: messageText,
         userEmail: userEmail || "invite@gmail.com",
-        chatId: getOrCreateChatId()
+        chatId: getOrCreateChatId(),
+        model: model
     };
 
     try {
@@ -116,6 +114,7 @@ window.onload = function () {
         callback: handleCredentialResponse
     });
     
+    document.getElementById('google').showModal()
     google.accounts.id.renderButton(
         document.getElementById("google-btn"),
         { theme: "filled_blue", size: "medium" }
