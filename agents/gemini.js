@@ -1,36 +1,28 @@
+import { GoogleGenAI } from '@google/genai';
+
 export async function appelerGemini(userMessage, systemPrompt, env) {
   if (!env.gemini_api) {
     throw new Error("La variable 'gemini_api' n'est pas définie dans Cloudflare.");
   }
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${env.gemini_api}`;
 
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      system_instruction: {
-        parts: [{ text: systemPrompt }]
-      },
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: userMessage }]
-        }
-      ]
-    })
+  const client = new GoogleGenAI({ apiKey: env.gemini_api });
+
+  const interaction = await client.interactions.create({
+    model: 'gemini-2.5-flash',
+    input: userMessage,
+    systemInstruction: systemPrompt
   });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Erreur Gemini (${response.status}): ${errorText}`);
+  let responseText = "";
+
+  for (const step of interaction.steps) {
+    if (step.type === 'model_output' && step.content?.[0]?.text) {
+      responseText += step.content[0].text;
+    }
   }
 
-  const data = await response.json();
-
-  if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
-    return "<img class='logo-model' src='./assets/img/gemini.svg'>" + data.candidates[0].content.parts[0].text;
+  if (responseText) {
+    return "<img class='logo-model' src='./assets/img/gemini.svg'>" + responseText;
   }
 
   throw new Error("Réponse vide de la part de Gemini.");
