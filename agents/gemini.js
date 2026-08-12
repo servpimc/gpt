@@ -8,7 +8,7 @@ export async function appelerGemini(userMessage, systemPrompt, env) {
   const client = new GoogleGenAI({ apiKey: env.gemini_api });
 
   const interaction = await client.interactions.create({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-2.5-flash-lite',
     input: userMessage,
     systemInstruction: systemPrompt
   });
