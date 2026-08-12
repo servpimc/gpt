@@ -116,11 +116,18 @@ window.onload = function () {
         callback: handleCredentialResponse
     });
     
-    document.getElementById('google').showModal()
-    google.accounts.id.renderButton(
-        document.getElementById("google-btn"),
-        { theme: "filled_blue", size: "medium" }
-    );
+    const modal = document.getElementById('google');
+    if (modal) {
+        modal.showModal();
+    }
+
+    const btnContainer = document.getElementById("google-btn");
+    if (btnContainer) {
+        google.accounts.id.renderButton(
+            btnContainer,
+            { theme: "filled_blue", size: "medium" }
+        );
+    }
 }
 
 function nouveauChat() {
