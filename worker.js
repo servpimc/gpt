@@ -58,7 +58,7 @@ export default {
         textResult = await appelerGemini(userMessage, systemPrompt, env);
       } catch (erreurGemini) {
         console.error("gemini 2.5flash à échoué:", erreurGemini);
-        textResult = "Désolé, le service Gemini est indisponible pour le moment. ${erreurGemini.message}";
+        textResult = `Désolé, le service Gemini est indisponible pour le moment. ${erreurGemini.message}`;
       }
     }else {
       textResult = await appelerGroq(userMessage, systemPrompt, env);
