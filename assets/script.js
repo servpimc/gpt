@@ -1,4 +1,4 @@
-const WORKER_URL = "https://agent-ia.servpimc.workers.dev/"; 
+const WORKER_URL = "https://agent-ia.servpimc.workers.dev"; 
 let userEmail = null;
 
 marked.setOptions({
@@ -32,7 +32,7 @@ function parseJwt(token) {
     }
 }
 
-function handleCredentialResponse(response) {
+async function handleCredentialResponse(response) {
     const payload = parseJwt(response.credential);
     
     if (payload && payload.email) {
@@ -42,11 +42,12 @@ function handleCredentialResponse(response) {
         document.getElementById("google").close();
         try {
             const conversations = await chargerConversationsUtilisateur(userEmail);
+            
             if (Array.isArray(conversations)) {
                 const htmlContent = conversations.map(c => `
-                    <div class="channel-item" data-chat-id="${c.chat_id}">
-                        Conversation du ${new Date(c.date_creation).toLocaleDateString()}
-                    </div>
+                    <li class="channel-item" data-chat-id="${c.chat_id}">
+                        <a href="#">${c.titre || "Nouvelle conversation"}</a>
+                    </li>
                 `).join('');
                 document.getElementById("container-chanel").innerHTML = htmlContent;
             }
@@ -58,7 +59,6 @@ function handleCredentialResponse(response) {
         console.warn("Impossible de récupérer l'email depuis le token.");
         document.getElementById("google_h2").innerText = "Une erreur est survenue";
     }
-
 }
 
 async function sendMessage() {
@@ -145,7 +145,7 @@ window.onload = function () {
 
 function newChat() {
     sessionStorage.removeItem("current_chat_id");
-    document.getElementById("chat-container").innerHTML = '<h2 id="title-chat">Utilisation CPU</h2> <div id="msg-agent-0" class="message agent">Bienvenue ! Que puis-je faire pour vous ?</div>'
+    document.getElementById("chat-container").innerHTML = '<h2 id="title-chat">Utilisation CPU</h2> <div id="msg-agent-0" class="message agent">Bienvenue ! Que puis-je faire pour vous ?</div>';
 }
 
 async function chargerConversationsUtilisateur(userEmail) {
