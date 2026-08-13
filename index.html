@@ -11,7 +11,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script defer src="./assets/script.js"></script>
-    <script defer type="module" src="./assets/history.js"></script>
+    <script defer src="./assets/historique.js"></script>
+    <script defer src="./assets/msg.js"></script>
     <link rel="stylesheet" href="./assets/style.css">
 </head>
 <body>
@@ -22,25 +23,22 @@
 
     <nav id="sidebar">
         <button id="toggle-sidebar" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
-        <button id="new-chat" onclick="newChat()">☰</button>
+        <button id="new-chat" onclick="newChat()">NEW</button>
         <ul id="container-chanel">
-        <li><a href="#">Accueil</a></li>
-        <li><a href="#">Projets</a></li>
-        <li><a href="#">Contact</a></li>
         </ul>
     </nav>
     <div id="content">
         <div class="card" id="chat-container">
-            <h2 id="title-chat">Utilisation CPU</h2>
+            <h2 id="title-chat">Discution</h2>
             <div id="msg-agent-0" class="message agent">Bienvenue ! Connectez-vous avec Google pour démarrer une conversation.</div>
         </div>
         
         <div class="card" id="input-container">
             <input type="text" id="user-input" placeholder="Écris ton message ici..." onkeypress="if(event.key === 'Enter') sendMessage(document.getElementById('model-select').value)">
             <select name="model" id="model-select">
-                <option value="llama">llama 3.1-8b</option>
+                <option value="llama">llama</option>
                 <option value="open">open</option>
-                <option value="gemini">gemini 3.6 flash</option>
+                <option value="gemini">gemini</option>
             </select>
             <button onclick="sendMessage(document.getElementById('model-select').value)">⌲</button>
         </div>

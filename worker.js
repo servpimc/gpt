@@ -31,6 +31,22 @@ export default {
         return new Response(JSON.stringify({ error: "Impossible de récupérer les conversations." }), { status: 500, headers });
       }
     }
+    if (request.method === "GET" && url.pathname === "/historique") {
+      const userEmail = url.searchParams.get("userEmail");
+      const chatId = url.searchParams.get("chatId");
+
+      if (!userEmail || !chatId) {
+        return new Response(JSON.stringify({ error: "Les paramètre sont invalides." }), { status: 400, headers });
+      }
+
+      try {
+        const historique = await obtenirHistoriqueChat(userEmail, chatId, 20, env);
+        return new Response(JSON.stringify(historique), { headers });
+      } catch (erreur) {
+        console.error("Erreur obtenirHistoriqueChat:", erreur);
+        return new Response(JSON.stringify({ error: "Impossible de récupérer l'historique." }), { status: 500, headers });
+      }
+    }
 
     if (request.method !== "POST") return new Response(JSON.stringify({ error: "Ce Worker n'attend que des requêtes POST." }), { status: 405, headers });
 
@@ -95,7 +111,7 @@ export default {
       textResult = await appelerGroq(userMessage, systemPrompt, env);
     }
 
-    await enregistrerMessage(userEmail, chatId, "assistant", textResult, env);
+    await enregistrerMessage(userEmail, chatId, "agent", textResult, env);
 
     return new Response(JSON.stringify({ response: textResult }), { headers });
   }

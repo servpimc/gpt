@@ -21,6 +21,14 @@ dialog{ border-radius: 20px; width: 40dvw; height: 16dvh; align-content: center;
   background: transparent; color: inherit;
   border: none; cursor: pointer; transition: 0.3s; }
     #sidebar.open #toggle-sidebar { right: 20px; }
+#new-chat{
+    background-color: transparent;
+    color: white;
+    font-size: 22px;
+    font-weight: bold;
+    position: absolute;
+    top: 25px;
+}
 #sidebar {
   position: fixed; inset: 0 auto 0 -200px;
   width: 200px; background: #1e1e1e; color: #fff;
@@ -55,3 +63,9 @@ dialog{ border-radius: 20px; width: 40dvw; height: 16dvh; align-content: center;
         input::placeholder { color: #fff;}
     button { background: #F08488; color: #000; border: none; padding: 0 24px; border-radius: 24px; cursor: pointer; font-size: 36px; width: 15%; }
         button:hover { background: #FF9CB6; }
+    select{
+        color: #000;
+        background-color: #7D4FFE;
+        border-radius: 24px;
+        font-size: 16px;
+    }
