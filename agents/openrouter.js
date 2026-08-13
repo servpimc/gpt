@@ -37,7 +37,7 @@ export async function appelerOpen(userMessage, systemPrompt, env) {
     text = text.replace(/^User Safety:\s*safe\s*/i, "").trim();
 
     if (text.length > 0) {
-      return "<img class='logo-model' src='./assets/img/llama3.png'>" + text;
+      return "<img class='logo-model' src='./assets/img/openrouter.webp'>" + text;
     }
   }
 
