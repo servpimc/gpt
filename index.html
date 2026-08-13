@@ -38,7 +38,8 @@
             <input type="text" id="user-input" placeholder="Écris ton message ici..." onkeypress="if(event.key === 'Enter') sendMessage(document.getElementById('model-select').value)">
             <select name="model" id="model-select">
                 <option value="llama">llama 3.1-8b</option>
-                <option value="gemini">gemini 2.5 flash</option>
+                <option value="open">open</option>
+                <option value="gemini">gemini 3.6 flash</option>
             </select>
             <button onclick="sendMessage(document.getElementById('model-select').value)">⌲</button>
         </div>

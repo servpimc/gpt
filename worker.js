@@ -1,6 +1,7 @@
 import { appelerCloudflareAI } from './agents/cloudflare.js';
 import { appelerGroq } from './agents/groq.js';
 import { appelerGemini } from './agents/gemini.js';
+import { appelerOpen } from './agents/openrouter.js';
 import { enregistrerMessage, obtenirHistoriqueChat } from "./assets/history.js";
 
 const headers = {
@@ -56,6 +57,13 @@ export default {
     }else if(model=="gemini"){
       try {
         textResult = await appelerGemini(userMessage, systemPrompt, env);
+      } catch (erreurGemini) {
+        console.error("gemini 2.5flash à échoué:", erreurGemini);
+        textResult = `Désolé, le service Gemini est indisponible pour le moment. ${erreurGemini.message}`;
+      }
+    }else if(model=="open"){
+      try {
+        textResult = await appelerOpen(userMessage, systemPrompt, env);
       } catch (erreurGemini) {
         console.error("gemini 2.5flash à échoué:", erreurGemini);
         textResult = `Désolé, le service Gemini est indisponible pour le moment. ${erreurGemini.message}`;
