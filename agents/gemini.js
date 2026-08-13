@@ -1,5 +1,3 @@
-import { GoogleGenAI } from '@google/genai';
-
 export async function appelerGemini(userMessage, systemPrompt, env) {
   if (!env.gemini_api) {
     throw new Error("La variable 'gemini_api' n'est pas définie dans Cloudflare.");

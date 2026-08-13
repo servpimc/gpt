@@ -39,7 +39,20 @@ function handleCredentialResponse(response) {
         userEmail = payload.email;
         console.log("Email récupéré avec succès :", userEmail);
         document.getElementById("msg-agent-0").innerText = "Bienvenue ! Que puis-je faire pour vous ?";
-        document.getElementById('google').close();
+        document.getElementById("google").close();
+        try {
+            const conversations = await chargerConversationsUtilisateur(userEmail);
+            if (Array.isArray(conversations)) {
+                const htmlContent = conversations.map(c => `
+                    <div class="channel-item" data-chat-id="${c.chat_id}">
+                        Conversation du ${new Date(c.date_creation).toLocaleDateString()}
+                    </div>
+                `).join('');
+                document.getElementById("container-chanel").innerHTML = htmlContent;
+            }
+        } catch(error) {
+            console.error("history fail: ", error);
+        }
         
     } else {
         console.warn("Impossible de récupérer l'email depuis le token.");
@@ -125,12 +138,33 @@ window.onload = function () {
     if (btnContainer) {
         google.accounts.id.renderButton(
             btnContainer,
-            { theme: "filled_blue", size: "medium" }
+            { theme: "filled_blue", size: "big" }
         );
     }
 }
 
-function nouveauChat() {
+function newChat() {
     sessionStorage.removeItem("current_chat_id");
-    document.getElementById("chat-container").innerHTML = "";
+    document.getElementById("chat-container").innerHTML = '<h2 id="title-chat">Utilisation CPU</h2> <div id="msg-agent-0" class="message agent">Bienvenue ! Que puis-je faire pour vous ?</div>'
+}
+
+async function chargerConversationsUtilisateur(userEmail) {
+  try {
+    const response = await fetch(`${WORKER_URL}/conversations?userEmail=${encodeURIComponent(userEmail)}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erreur lors de la récupération: ${response.status}`);
+    }
+
+    const conversations = await response.json();
+    console.log("Conversations de l'utilisateur :", conversations); 
+    return conversations;
+  } catch (erreur) {
+    console.error("Erreur Frontend :", erreur);
+  }
 }

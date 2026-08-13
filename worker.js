@@ -2,7 +2,7 @@ import { appelerCloudflareAI } from './agents/cloudflare.js';
 import { appelerGroq } from './agents/groq.js';
 import { appelerGemini } from './agents/gemini.js';
 import { appelerOpen } from './agents/openrouter.js';
-import { enregistrerMessage, obtenirHistoriqueChat } from "./assets/history.js";
+import { enregistrerMessage, obtenirHistoriqueChat, listerConversations } from "./assets/history.js";
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -14,6 +14,23 @@ const headers = {
 export default {
   async fetch(request, env) {
     if (request.method === "OPTIONS") return new Response(null, { headers });
+
+    const url = new URL(request.url);
+    
+    if (request.method === "GET" && url.pathname === "/conversations") {
+      const userEmail = url.searchParams.get("userEmail");
+      if (!userEmail) {
+        return new Response(JSON.stringify({ error: "Les paramètre sont invalides." }), { status: 400, headers });
+      }
+
+      try {
+        const conversations = await listerConversations(userEmail, env);
+        return new Response(JSON.stringify(conversations), { headers });
+      } catch (erreur) {
+        console.error("Erreur listerConversations:", erreur);
+        return new Response(JSON.stringify({ error: "Impossible de récupérer les conversations." }), { status: 500, headers });
+      }
+    }
 
     if (request.method !== "POST") return new Response(JSON.stringify({ error: "Ce Worker n'attend que des requêtes POST." }), { status: 405, headers });
 
@@ -65,14 +82,13 @@ export default {
       try {
         textResult = await appelerOpen(userMessage, systemPrompt, env);
       } catch (erreurOpen) {
-        console.error("gemini 2.5flash à échoué:", erreurOpen);
+        console.error("Openrouter à échoué:", erreurOpen);
         textResult = `Désolé, le service Openrouter est indisponible pour le moment. ${erreurOpen.message}`;
       }
     }else {
       textResult = await appelerGroq(userMessage, systemPrompt, env);
     }
 
-    // 3. Enregistrer la réponse de l'IA dans D1
     await enregistrerMessage(userEmail, chatId, "assistant", textResult, env);
 
     return new Response(JSON.stringify({ response: textResult }), { headers });
