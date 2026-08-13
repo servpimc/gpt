@@ -1,6 +1,5 @@
 import { appelerCloudflareAI } from './agents/cloudflare.js';
 import { appelerGroq } from './agents/groq.js';
-import { appelerGemini } from './agents/gemini.js';
 import { appelerOpen } from './agents/openrouter.js';
 import { enregistrerMessage, obtenirHistoriqueChat, listerConversations } from "./backend/history.js";
 
@@ -17,6 +16,7 @@ export default {
 
     const url = new URL(request.url);
 
+    //  frontend historique
     if (request.method === "GET" && url.pathname === "/conversations") {
       const userEmail = url.searchParams.get("userEmail");
       if (!userEmail) {
@@ -81,6 +81,7 @@ export default {
       return new Response(JSON.stringify({ response: "Erreur : Format JSON invalide." }), { status: 400, headers });
     }
 
+    //  appel agent
     if (model == "llama") {
       try {
         textResult = await appelerCloudflareAI(userMessage, systemPrompt, env);
@@ -104,6 +105,7 @@ export default {
       textResult = await appelerGroq(userMessage, systemPrompt, env);
     }
 
+    //  historique
     await enregistrerMessage(userEmail, chatId, "agent", textResult, env);
 
     return new Response(JSON.stringify({ response: textResult }), { headers });

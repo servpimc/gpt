@@ -53,7 +53,7 @@ dialog{ border-radius: 20px; width: 40dvw; height: 16dvh; align-content: center;
     .logo-model { display: inline-block; height: 60px; width: auto; vertical-align: middle; margin-right: 6px; }
     .agent p { margin: 0 0 10px 0; }
         .agent p:last-child { margin-bottom: 0; }
-    .agent pre { background: #0d1117; padding: 12px; border-radius: 8px; overflow-x: auto; border: 1px solid #30363d; margin: 10px 0; max-width: 92%; box-sizing: border-box; }
+    .agent pre { background: #0d1117; padding: 12px; border-radius: 8px; overflow-x: auto; border: 1px solid #30363d; margin: 10px 0; max-width: 92%; box-sizing: border-box; text-align: left; }
     .agent code { font-family: 'Fira Code', 'Consolas', Monaco, monospace; font-size: 0.9em; }
     .agent :not(pre) > code { background: #2d2d2d; padding: 2px 6px; border-radius: 4px; color: #f38020; }
 
