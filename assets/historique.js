@@ -15,7 +15,7 @@ async function afficheHistorique(userEmail) {
     if (Array.isArray(conversations)) {
         const htmlContent = conversations.map(c => `
             <li class="channel-item" data-chat-id="${c.chat_id}">
-                <a href="#" onclick="loadChat('${userEmail}', '${c.chat_id}')">${c.titre || "Nouvelle conversation"}</a>
+                <a id="${c.chat_id}" onclick="loadChat('${userEmail}', '${c.chat_id}')">${c.titre+"..." || "Nouvelle conversation"}</a>
             </li>
         `).join('');
         document.getElementById("container-chanel").innerHTML = htmlContent;
@@ -39,7 +39,7 @@ async function loadChat(userEmail, chatId) {
     const messages = await response.json();
     
     const chatContainer = document.getElementById("chat-container");
-    chatContainer.innerHTML = '<h2 id="title-chat">Discussion</h2>';
+    chatContainer.innerHTML = '<h2 id="title-chat">'+document.getElementById(chatId).innerText+'</h2>';
 
     if (Array.isArray(messages)) {
       messages.forEach(msg => {

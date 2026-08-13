@@ -7,7 +7,8 @@ const headers = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
-  "Content-Type": "application/json"
+  "Content-Type": "application/json",
+  "Authorization": `Bearer ${googleToken}`
 };
 
 export default {

@@ -1,5 +1,4 @@
 const WORKER_URL = "https://agent-ia.servpimc.workers.dev"; 
-let userEmail = null;
 
 marked.setOptions({
     highlight: function(code, lang) {
@@ -27,7 +26,7 @@ async function handleCredentialResponse(response) {
     const payload = parseJwt(response.credential);
     
     if (payload && payload.email) {
-        userEmail = payload.email;
+        const userEmail = payload.email;
         console.log("Email récupéré avec succès :", userEmail);
         document.getElementById("msg-agent-0").innerText = "Bienvenue ! Que puis-je faire pour vous ?";
         document.getElementById("google").close();
