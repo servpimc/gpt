@@ -64,9 +64,9 @@ export default {
     }else if(model=="open"){
       try {
         textResult = await appelerOpen(userMessage, systemPrompt, env);
-      } catch (erreurGemini) {
-        console.error("gemini 2.5flash à échoué:", erreurGemini);
-        textResult = `Désolé, le service Gemini est indisponible pour le moment. ${erreurGemini.message}`;
+      } catch (erreurOpen) {
+        console.error("gemini 2.5flash à échoué:", erreurOpen);
+        textResult = `Désolé, le service Openrouter est indisponible pour le moment. ${erreurOpen.message}`;
       }
     }else {
       textResult = await appelerGroq(userMessage, systemPrompt, env);

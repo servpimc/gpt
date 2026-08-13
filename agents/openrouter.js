@@ -31,8 +31,14 @@ export async function appelerOpen(userMessage, systemPrompt, env) {
 
   const data = await response.json();
 
-  if (data.choices && data.choices[0]?.message?.content) {
-    return "<img class='logo-model' src='./assets/img/llama3.png'>" + data.choices[0].message.content;
+  let text = data.choices && data.choices[0]?.message?.content;
+
+  if (text) {
+    text = text.replace(/^User Safety:\s*safe\s*/i, "").trim();
+
+    if (text.length > 0) {
+      return "<img class='logo-model' src='./assets/img/llama3.png'>" + text;
+    }
   }
 
   throw new Error("Réponse vide de la part d'OpenRouter.");
