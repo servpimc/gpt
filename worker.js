@@ -93,13 +93,6 @@ export default {
           textResult = "Désolé, les services d'IA sont indisponibles pour le moment.";
         }
       }
-    }else if(model=="gemini"){
-      try {
-        textResult = await appelerGemini(userMessage, systemPrompt, env);
-      } catch (erreurGemini) {
-        console.error("gemini 2.5flash à échoué:", erreurGemini);
-        textResult = `Désolé, le service Gemini est indisponible pour le moment. ${erreurGemini.message}`;
-      }
     }else if(model=="open"){
       try {
         textResult = await appelerOpen(userMessage, systemPrompt, env);
