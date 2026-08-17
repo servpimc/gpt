@@ -56,7 +56,6 @@ export default {
       2. NE REÉCRIS PAS le code existant s'il n'y a pas de besoin et NE SUPPRIME AUCUNE fonctionnalité déjà présente. 
       3. Ne fais pas de sur-ingénierie : apporte la solution la plus simple, ciblée et exacte. 
       4. Réponds toujours en français de manière directe et concise.
-      5. Lorsque tu génères un bloc de code, utilise TOUJOURS des blocs de code multilignes Markdown précédés et suivis de trois backticks (ex: \`\`\`javascript ... \`\`\`). Indique TOUJOURS le nom du langage (javascript, css, html, etc.) juste après les trois backticks d'ouverture.
     `;
 
     try {
