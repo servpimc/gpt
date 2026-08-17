@@ -21,6 +21,11 @@
         <div id="google-btn"></div>
     </dialog>
 
+    <div id="entete">
+        <h2 id="title-chat">Nouvelle discution</h2>
+        <button id="name" value="edit" onclick="rename(document.getElementById('name').value)">✏️</button>
+    </div>
+
     <nav id="sidebar">
         <button id="toggle-sidebar" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
         <button id="new-chat" onclick="newChat()">NEW</button>
@@ -28,18 +33,18 @@
         </ul>
     </nav>
     <div id="content">
+        
         <div class="card" id="chat-container">
-            <h2 id="title-chat">Discution</h2>
             <div id="msg-agent-0" class="message agent">Bienvenue ! Connectez-vous avec Google pour démarrer une conversation.</div>
         </div>
         
         <div class="card" id="input-container">
-            <input type="text" id="user-input" placeholder="Écris ton message ici..." onkeypress="if(event.key === 'Enter') sendMessage(document.getElementById('model-select').value)">
+            <input type="text" id="user-input" placeholder="Écris ton message ici..." onkeypress="if(event.key === 'Enter') sendMessage()">
             <select name="model" id="model-select">
                 <option value="llama">llama</option>
                 <option value="open">open</option>
             </select>
-            <button onclick="sendMessage(document.getElementById('model-select').value)">⌲</button>
+            <button onclick="sendMessage()" id="send">⌲</button>
         </div>
         
     </div>

@@ -1,7 +1,7 @@
 import { appelerCloudflareAI } from './agents/cloudflare.js';
 import { appelerGroq } from './agents/groq.js';
 import { appelerOpen } from './agents/openrouter.js';
-import { enregistrerMessage, obtenirHistoriqueChat, listerConversations } from "./backend/history.js";
+import { enregistrerMessage, loadChat, listerConversations, renameConversation } from "./backend/history.js";
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -40,11 +40,28 @@ export default {
       }
 
       try {
-        const historique = await obtenirHistoriqueChat(userEmail, chatId, 20, env);
+        const historique = await loadChat(userEmail, chatId, 20, env);
         return new Response(JSON.stringify(historique), { headers });
       } catch (erreur) {
-        console.error("Erreur obtenirHistoriqueChat:", erreur);
+        console.error("Erreur loadChat:", erreur);
         return new Response(JSON.stringify({ error: "Impossible de récupérer l'historique." }), { status: 500, headers });
+      }
+    }
+    if (request.method === "GET" && url.pathname === "/renameConv") {
+      const userEmail = url.searchParams.get("userEmail");
+      const chatId = url.searchParams.get("chatId");
+      const title = url.searchParams.get("title");
+
+      if (!userEmail || !chatId || !title) {
+        return new Response(JSON.stringify({ error: "Les paramètre sont invalides." }), { status: 400, headers });
+      }
+
+      try {
+        const name = await renameConversation(title, chatId, userEmail, env);
+        return new Response(JSON.stringify(name), { headers });
+      } catch (erreur) {
+        console.error("Erreur renameConversation:", erreur);
+        return new Response(JSON.stringify({ error: "Impossible de changer le titre." }), { status: 500, headers });
       }
     }
 
@@ -71,7 +88,7 @@ export default {
 
       await enregistrerMessage(userEmail, chatId, "user", userMessage, env);
 
-      const historique = await obtenirHistoriqueChat(userEmail, chatId, 6, env);
+      const historique = await loadChat(userEmail, chatId, 6, env);
       if (historique.length > 0) {
         systemPrompt += " " + historique.map(m => `${m.role}: ${m.content}`).join(" ");
       }

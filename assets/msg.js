@@ -1,7 +1,7 @@
-
 function newChat() {
     sessionStorage.removeItem("current_chat_id");
-    document.getElementById("chat-container").innerHTML = '<h2 id="title-chat">Nouvelle discution</h2> <div id="msg-agent-0" class="message agent">Bienvenue ! Que puis-je faire pour vous ?</div>';
+    document.getElementById("chat-container").innerHTML ='<div id="msg-agent-0" class="message agent">Bienvenue ! Que puis-je faire pour vous ?</div>';
+    document.getElementById("title-chat").innerText="Nouvelle discution";
     afficheHistorique(userEmail);
 }
 
