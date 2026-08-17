@@ -14,7 +14,7 @@ export async function loadChat(userEmail, chatId, limit = 6, env) {
 
 export async function listerConversations(userEmail, env) {
   const { results } = await env.DB.prepare(`
-    SELECT chat_id, MIN(created_at) as date_creation, COALESCE(title, SUBSTR((SELECT content FROM history h2 WHERE h2.chat_id = history.chat_id AND h2.role = 'user' ORDER BY id ASC LIMIT 1),1, 30)) as titre
+    SELECT chat_id, MIN(created_at) as date_creation, COALESCE(title, SUBSTR((SELECT content FROM history h2 WHERE h2.chat_id = history.chat_id AND h2.role = 'user' ORDER BY id ASC LIMIT 1),1, 30)||"...") as titre
     FROM history 
     WHERE user_email = ? 
     GROUP BY chat_id 
