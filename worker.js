@@ -1,7 +1,7 @@
 import { appelerCloudflareAI } from './agents/cloudflare.js';
 import { appelerGroq } from './agents/groq.js';
 import { appelerOpen } from './agents/openrouter.js';
-import { enregistrerMessage, loadChat, listerConversations, renameConversation, delConversation } from "./backend/history.js";
+import { saveChatIa, saveChatUser, loadChat, loadChatUser, listerConversations, renameConversation, delConversation } from "./backend/history.js";
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -17,18 +17,28 @@ export default {
     const url = new URL(request.url);
 
     //  frontend historique
-    if (request.method === "GET" && url.pathname === "/conversations") {
+    if (request.method === "GET" && (url.pathname === "/conversations"||url.pathname === "/chatuser")) {
       const userEmail = url.searchParams.get("userEmail");
-      if (!userEmail) {
+      if (!userEmail && url.pathname !== "/chatuser") {
         return new Response(JSON.stringify({ error: "Les paramètre sont invalides." }), { status: 400, headers });
       }
 
-      try {
-        const conversations = await listerConversations(userEmail, env);
-        return new Response(JSON.stringify(conversations), { headers });
-      } catch (erreur) {
-        console.error("Erreur listerConversations:", erreur);
-        return new Response(JSON.stringify({ error: "Impossible de récupérer les conversations." }), { status: 500, headers });
+      if(url.pathname === "/chatuser"){
+        try {
+          const historique = await loadChatUser(env);
+          return new Response(JSON.stringify(historique), { headers });
+        } catch (erreur) {
+          console.error("Erreur loadChat:", erreur);
+          return new Response(JSON.stringify({ error: "Impossible de récupérer l'historique general." }), { status: 500, headers });
+        }
+      }else{
+        try {
+          const conversations = await listerConversations(userEmail, env);
+          return new Response(JSON.stringify(conversations), { headers });
+        } catch (erreur) {
+          console.error("Erreur listerConversations:", erreur);
+          return new Response(JSON.stringify({ error: "Impossible de récupérer les conversations." }), { status: 500, headers });
+        }
       }
     }
     if (request.method === "GET" && (url.pathname === "/historique"||url.pathname === "/deleteConv")) {
@@ -93,11 +103,23 @@ export default {
       chatId = body.chatId;
       model = body.model;
 
+      if (request.method === "POST" && url.pathname === "/chatuser"){
+        if (!userMessage || !userEmail ) return new Response(JSON.stringify({ response: "Erreur : Paramètres manquants (message, userEmail, chatId)." }), { status: 400, headers });
+        try {
+          await saveChatUser(userEmail, userMessage, env);
+          console.log('Sauvegarde réussie');
+          return new Response(JSON.stringify({ response: "Sauvegarde réussie" }), { status: 200, headers });
+        } catch (error) {
+          console.error('Erreur lors de la sauvegarde :', error);
+          return new Response(JSON.stringify({ response: "Erreur lors de la sauvegarde" }), { status: 500, headers });
+        }
+      }
+
       if (!userMessage || !userEmail || !chatId) {
         return new Response(JSON.stringify({ response: "Erreur : Paramètres manquants (message, userEmail, chatId)." }), { status: 400, headers });
       }
 
-      await enregistrerMessage(userEmail, chatId, "user", userMessage, env);
+      await saveChatIa(userEmail, chatId, "user", userMessage, env);
 
       const historique = await loadChat(userEmail, chatId, env, 6);
       if (historique.length > 0) {
@@ -141,7 +163,7 @@ export default {
     }
 
     //  historique
-    await enregistrerMessage(userEmail, chatId, "agent", textResult, env);
+    await saveChatIa(userEmail, chatId, "agent", textResult, env);
 
     return new Response(JSON.stringify({ response: textResult }), { headers });
   }

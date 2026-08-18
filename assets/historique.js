@@ -1,6 +1,6 @@
-async function afficheHistorique(userEmail) {
+async function afficheHistorique(user_email = userEmail) {
   try {
-    const response = await fetch(`${WORKER_URL}/conversations?userEmail=${encodeURIComponent(userEmail)}`, {
+    const response = await fetch(`${WORKER_URL}/conversations?userEmail=${encodeURIComponent(user_email)}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
@@ -15,8 +15,8 @@ async function afficheHistorique(userEmail) {
     if (Array.isArray(conversations)) {
         const htmlContent = conversations.map(c => `
             <li class="channel-item" data-chat-id="${c.chat_id}">
-                <a id="${c.chat_id}" onclick="loadChat('${userEmail}', '${c.chat_id}')">${c.titre || "Nouvelle conversation"}</a>
-                <button onclick="deleteConversation('${c.chat_id}','${userEmail}')"> x </button>
+                <a id="${c.chat_id}" onclick="loadChat('${user_email}', '${c.chat_id}')">${c.titre || "Nouvelle conversation"}</a>
+                <button onclick="deleteConversation('${c.chat_id}','${user_email}')"> x </button>
             </li>
         `).join('');
         document.getElementById("container-chanel").innerHTML = htmlContent;
@@ -37,7 +37,7 @@ async function loadChat(userEmail, chatId) {
     if (!response.ok) throw new Error(`Erreur: ${response.status}`);
 
     const messages = await response.json();
-    
+    if(document.getElementById("name").style.display == 'none') toggleUserChat();
     newChat();
     document.getElementById('title-chat').innerText=document.getElementById(chatId).innerText;
 
@@ -51,6 +51,33 @@ async function loadChat(userEmail, chatId) {
 
   } catch (erreur) {
     console.error("Erreur chargement historique :", erreur);
+  }
+}
+
+async function loadChatUser(){
+  try {
+    const response = await fetch(`${WORKER_URL}/chatuser`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" }
+    });
+
+    if (!response.ok) throw new Error(`Erreur: ${response.status}`);
+
+    const messages = await response.json();
+    
+    document.getElementById("chat-container").innerHTML ='';
+    document.getElementById("title-chat").innerText="Général";
+    if(document.getElementById("name").style.display !== 'none') toggleUserChat();
+
+    if (Array.isArray(messages)) {
+      messages.forEach(msg => {
+        let role= (msg.email===userEmail)?"user":"other";
+        appendMessage(msg.content, role);
+      });
+    }
+
+  } catch (erreur) {
+    console.error("Erreur chargement historique général:", erreur);
   }
 }
 

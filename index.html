@@ -29,6 +29,10 @@
     <nav id="sidebar">
         <button id="toggle-sidebar" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
         <button id="new-chat" onclick="newChat()">NEW</button>
+        <div id="select-cat">
+            <button class='selected' id='ia' style="width:45%" onclick="afficheHistorique(); document.getElementById('ia').classList.add('selected'); document.getElementById('user').classList.remove('selected')">IA</button>
+            <button id='user' style="width:55%" onclick="listerChatUser()">User</button>
+        </div>
         <ul id="container-chanel">
         </ul>
     </nav>
@@ -44,7 +48,7 @@
                 <option value="llama">llama</option>
                 <option value="open">open</option>
             </select>
-            <button onclick="sendMessage()" id="send">⌲</button>
+            <button onclick="sendIa()" id="send">⌲</button>
         </div>
         
     </div>

@@ -60,3 +60,21 @@ window.onload = function () {
         );
     }
 }
+
+function listerChatUser(){
+    document.getElementById('user').classList.add('selected'); 
+    document.getElementById('ia').classList.remove('selected');
+    document.getElementById('container-chanel').innerHTML=`
+        <li class="channel-item">
+            <a id="" onclick="loadChatUser()">Chat général</a>
+        </li>
+    `; 
+}
+
+function toggleUserChat(){
+    let display = document.getElementById("name").style.display == 'none' ? 'block' : 'none';
+    document.getElementById("name").style.display=display;
+    document.getElementById("model-select").style.display=display;
+    document.getElementById('send').onclick = function() { sendUser(); };
+    return display;
+}

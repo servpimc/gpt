@@ -14,7 +14,7 @@ function getOrCreateChatId() {
     return chatId;
 }
 
-async function sendMessage() {
+async function sendIa() {
     const input = document.getElementById('user-input');
     const messageText = input.value.trim();
     const modelSelect = document.getElementById('model-select');
@@ -56,6 +56,41 @@ async function sendMessage() {
     container.scrollTop = container.scrollHeight;
 }
 
+async function sendUser() {
+    try{
+        let input = document.getElementById('user-input');
+        const messageText = input.value.trim();
+        if (!messageText) return input="erreur du messageText";
+
+        const payload = { 
+            message: messageText,
+            userEmail: userEmail
+        };
+
+        try {
+            const response = await fetch(`${WORKER_URL}/chatuser`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log(data);
+                appendMessage(messageText, 'user');
+                input.value = '';
+                const container = document.getElementById('chat-container');
+                container.scrollTop = container.scrollHeight;
+            }
+
+        } catch (error) {
+            console.error("erreur lors de la sauvegarde")
+        }
+    }catch (error) {
+        appendMessage("Erreur de lors de l'enregistrement.", 'agent');
+    }
+}
+
 function appendMessage(text, sender) {
     const container = document.getElementById('chat-container');
     const messageDiv = document.createElement('div');
@@ -74,6 +109,3 @@ function appendMessage(text, sender) {
     container.scrollTop = container.scrollHeight;
     return messageDiv.id;
 }
-
-window.newChat = newChat;
-window.sendMessage = sendMessage;
