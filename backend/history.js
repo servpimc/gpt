@@ -4,11 +4,10 @@ export async function enregistrerMessage(userEmail, chatId, role, content, env) 
   ).bind(userEmail, chatId, role, content).run();
 }
 
-export async function loadChat(userEmail, chatId, env) {
-  const { results } = await env.DB.prepare(
-    "SELECT role, content FROM history WHERE user_email = ? AND chat_id = ? ORDER BY id DESC"
-  ).bind(userEmail, chatId).all();
-
+export async function loadChat(userEmail, chatId, env, limit = null) {
+  let query = "SELECT role, content FROM history WHERE user_email = ? AND chat_id = ? ORDER BY id DESC";
+  if (limit) query += ` LIMIT ${parseInt(limit)}`;
+  const { results } = await env.DB.prepare(query).bind(userEmail, chatId).all();
   return results.reverse();
 }
 
@@ -31,6 +30,16 @@ export async function renameConversation(title, chatId, userEmail, env) {
     where history.chat_id = ? 
     AND user_email = ?;
   `).bind(title, chatId, userEmail).all();
+
+  return results;
+}
+
+export async function delConversation(chatId, userEmail, env) {
+  const { results } = await env.DB.prepare(`
+    update history 
+    where history.chat_id = ? 
+    AND user_email = ?;
+  `).bind( chatId, userEmail).all();
 
   return results;
 }

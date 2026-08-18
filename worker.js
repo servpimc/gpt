@@ -88,7 +88,7 @@ export default {
 
       await enregistrerMessage(userEmail, chatId, "user", userMessage, env);
 
-      const historique = await loadChat(userEmail, chatId, 6, env);
+      const historique = await loadChat(userEmail, chatId, env, 6);
       if (historique.length > 0) {
         systemPrompt += " " + historique.map(m => `${m.role}: ${m.content}`).join(" ");
       }
@@ -98,27 +98,35 @@ export default {
     }
 
     //  appel agent
-    if (model == "llama") {
-      try {
-        textResult = await appelerCloudflareAI(userMessage, systemPrompt, env);
-      } catch (erreurCloudflare) {
-        console.error("llama4 à échoué:", erreurCloudflare);
+    try{
+      if (model == "llama") {
         try {
-          textResult = await appelerGroq(userMessage, systemPrompt, env);
-        } catch (erreurGroq) {
-          console.error("Groq a également échoué:", erreurGroq);
-          textResult = "Désolé, les services d'IA sont indisponibles pour le moment.";
+          textResult = await appelerCloudflareAI(userMessage, systemPrompt, env);
+        } catch (erreurCloudflare) {
+          console.error("llama4 à échoué:", erreurCloudflare);
+          try {
+            textResult = await appelerGroq(userMessage, systemPrompt, env);
+          } catch (erreurGroq) {
+            console.error("Groq a également échoué:", erreurGroq);
+            textResult = "Désolé, les services d'IA sont indisponibles pour le moment.";
+          }
         }
+      }else if(model=="open"){
+        try {
+          textResult = await appelerOpen(userMessage, systemPrompt, env);
+        } catch (erreurOpen) {
+          console.error("Openrouter à échoué:", erreurOpen);
+          textResult = `Désolé, le service Openrouter est indisponible pour le moment. ${erreurOpen.message}`;
+        }
+      }else {
+        textResult = await appelerGroq(userMessage, systemPrompt, env);
       }
-    }else if(model=="open"){
-      try {
-        textResult = await appelerOpen(userMessage, systemPrompt, env);
-      } catch (erreurOpen) {
-        console.error("Openrouter à échoué:", erreurOpen);
-        textResult = `Désolé, le service Openrouter est indisponible pour le moment. ${erreurOpen.message}`;
-      }
-    }else {
-      textResult = await appelerGroq(userMessage, systemPrompt, env);
+    }catch(err){
+      console.error("Erreur API IA :", err);
+      return new Response(
+        JSON.stringify({ response: `Erreur API IA: ${err.message || err}` }), 
+        { status: 500, headers }
+      );
     }
 
     //  historique

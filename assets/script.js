@@ -32,6 +32,8 @@ async function handleCredentialResponse(response) {
         document.getElementById("msg-agent-0").innerText = "Bienvenue ! Que puis-je faire pour vous ?";
         document.getElementById("google").close();
         afficheHistorique(userEmail);
+        sessionStorage.removeItem("current_chat_id");
+        getOrCreateChatId();
         
     } else {
         console.warn("Impossible de récupérer l'email depuis le token.");

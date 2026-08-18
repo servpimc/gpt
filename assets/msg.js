@@ -19,7 +19,7 @@ async function sendMessage() {
     const messageText = input.value.trim();
     const modelSelect = document.getElementById('model-select');
     const selectedModel = modelSelect ? modelSelect.value : 'llama';
-    if (!messageText) return;
+    if (!messageText) return input.value="erreur du messageText";
 
     appendMessage(messageText, 'user');
     input.value = '';
@@ -43,8 +43,7 @@ async function sendMessage() {
         const data = await response.json();
         
         if (response.ok && data.response) {
-            const formattedHtml = marked.parse(data.response);
-            document.getElementById(loadingId).innerHTML = formattedHtml;
+            document.getElementById(loadingId).innerHTML = marked.parse(data.response);
         } else {
             document.getElementById(loadingId).innerText = data.response || data.error || "Erreur 400 transmise par le serveur.";
         }
