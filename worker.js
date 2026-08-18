@@ -1,7 +1,7 @@
 import { appelerCloudflareAI } from './agents/cloudflare.js';
 import { appelerGroq } from './agents/groq.js';
 import { appelerOpen } from './agents/openrouter.js';
-import { enregistrerMessage, loadChat, listerConversations, renameConversation } from "./backend/history.js";
+import { enregistrerMessage, loadChat, listerConversations, renameConversation, delConversation } from "./backend/history.js";
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -31,21 +31,32 @@ export default {
         return new Response(JSON.stringify({ error: "Impossible de récupérer les conversations." }), { status: 500, headers });
       }
     }
-    if (request.method === "GET" && url.pathname === "/historique") {
+    if (request.method === "GET" && (url.pathname === "/historique"||url.pathname === "/deleteConv")) {
       const userEmail = url.searchParams.get("userEmail");
       const chatId = url.searchParams.get("chatId");
-
       if (!userEmail || !chatId) {
         return new Response(JSON.stringify({ error: "Les paramètre sont invalides." }), { status: 400, headers });
       }
 
-      try {
-        const historique = await loadChat(userEmail, chatId, env);
-        return new Response(JSON.stringify(historique), { headers });
-      } catch (erreur) {
-        console.error("Erreur loadChat:", erreur);
-        return new Response(JSON.stringify({ error: "Impossible de récupérer l'historique." }), { status: 500, headers });
+      if(url.pathname === "/historique"){
+        try {
+          const historique = await loadChat(userEmail, chatId, env);
+          return new Response(JSON.stringify(historique), { headers });
+        } catch (erreur) {
+          console.error("Erreur loadChat:", erreur);
+          return new Response(JSON.stringify({ error: "Impossible de récupérer l'historique." }), { status: 500, headers });
+        }
       }
+      if(url.pathname === "/deleteConv"){
+        try {
+          const deleting = await delConversation(userEmail, chatId, env);
+          return new Response(JSON.stringify(deleting), { headers });
+        } catch (erreur) {
+          console.error("Erreur deleteConv:", erreur);
+          return new Response(JSON.stringify({ error: "Impossible de suprimer la conversation." }), { status: 500, headers });
+        }
+      }
+
     }
     if (request.method === "GET" && url.pathname === "/renameConv") {
       const userEmail = url.searchParams.get("userEmail");

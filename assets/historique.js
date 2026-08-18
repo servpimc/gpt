@@ -14,8 +14,9 @@ async function afficheHistorique(userEmail) {
     const conversations = await response.json();
     if (Array.isArray(conversations)) {
         const htmlContent = conversations.map(c => `
-            <li class="channel-item" data-chat-id="${c.chat_id}">
-                <a id="${c.chat_id}" onclick="loadChat('${userEmail}', '${c.chat_id}')">${c.titre || "Nouvelle conversation"}</a>
+            <li class="channel-item" data-chat-id="${c.chat_id}" style="display:flex; height:60px align-item:center">
+                <a style="width:90%" id="${c.chat_id}" onclick="loadChat('${userEmail}', '${c.chat_id}')">${c.titre || "Nouvelle conversation"}</a>
+                <button onclick="deleteConversation('${c.chat_id}','${userEmail}')"> x </button>
             </li>
         `).join('');
         document.getElementById("container-chanel").innerHTML = htmlContent;
@@ -25,7 +26,6 @@ async function afficheHistorique(userEmail) {
     console.error("Erreur Frontend :", erreur);
   }
 }
-
 
 async function loadChat(userEmail, chatId) {
   try {
@@ -87,5 +87,18 @@ function rename(etat){
     }
 }
 
+async function deleteConversation( chatId, userEmail) {
+  try {
+    const response = await fetch(`${WORKER_URL}/deleteConv?chatId=${encodeURIComponent(chatId)}&userEmail=${encodeURIComponent(userEmail)}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" }
+    });
 
-window.loadChat = loadChat;
+    if (!response.ok) throw new Error(`Erreur: ${response.status}`);
+
+    afficheHistorique(userEmail);
+
+  } catch (erreur) {
+    console.error("Erreur chargement historique :", erreur);
+  }
+}

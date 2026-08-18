@@ -36,9 +36,9 @@ export async function renameConversation(title, chatId, userEmail, env) {
 
 export async function delConversation(chatId, userEmail, env) {
   const { results } = await env.DB.prepare(`
-    update history 
+    delete from history 
     where history.chat_id = ? 
-    AND user_email = ?;
+    and user_email = ?;
   `).bind( chatId, userEmail).all();
 
   return results;
