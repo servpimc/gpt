@@ -96,6 +96,7 @@ async function deleteConversation( chatId, userEmail) {
 
     if (!response.ok) throw new Error(`Erreur: ${response.status}`);
 
+    if (sessionStorage.getItem("current_chat_id") === chatId) newChat();
     afficheHistorique(userEmail);
 
   } catch (erreur) {

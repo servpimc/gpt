@@ -34,12 +34,12 @@ export async function renameConversation(title, chatId, userEmail, env) {
   return results;
 }
 
-export async function delConversation(chatId, userEmail, env) {
+export async function delConversation(userEmail, chatId, env) {
   const { results } = await env.DB.prepare(`
     delete from history 
     where history.chat_id = ? 
     and user_email = ?;
-  `).bind( chatId, userEmail).all();
+  `).bind( chatId, userEmail).run();
 
   return results;
 }
