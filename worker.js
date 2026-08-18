@@ -40,7 +40,7 @@ export default {
       }
 
       try {
-        const historique = await loadChat(userEmail, chatId, 20, env);
+        const historique = await loadChat(userEmail, chatId, env);
         return new Response(JSON.stringify(historique), { headers });
       } catch (erreur) {
         console.error("Erreur loadChat:", erreur);

@@ -38,8 +38,8 @@ async function loadChat(userEmail, chatId) {
 
     const messages = await response.json();
     
-    const chatContainer = document.getElementById("title-chat");
-    chatContainer.innerText = document.getElementById(chatId).innerText;
+    newChat();
+    document.getElementById('title-chat').innerText=document.getElementById(chatId).innerText;
 
     if (Array.isArray(messages)) {
       messages.forEach(msg => {

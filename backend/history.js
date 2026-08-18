@@ -4,10 +4,10 @@ export async function enregistrerMessage(userEmail, chatId, role, content, env) 
   ).bind(userEmail, chatId, role, content).run();
 }
 
-export async function loadChat(userEmail, chatId, limit = 6, env) {
+export async function loadChat(userEmail, chatId, env) {
   const { results } = await env.DB.prepare(
-    "SELECT role, content FROM history WHERE user_email = ? AND chat_id = ? ORDER BY id DESC LIMIT ?"
-  ).bind(userEmail, chatId, limit).all();
+    "SELECT role, content FROM history WHERE user_email = ? AND chat_id = ? ORDER BY id DESC"
+  ).bind(userEmail, chatId).all();
 
   return results.reverse();
 }
