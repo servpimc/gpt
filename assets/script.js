@@ -73,8 +73,10 @@ function listerChatUser(){
 
 function toggleUserChat(){
     let display = document.getElementById("name").style.display == 'none' ? 'block' : 'none';
+    let func = display == 'block' ? sendIa : sendUser;
     document.getElementById("name").style.display=display;
     document.getElementById("model-select").style.display=display;
-    document.getElementById('send').onclick = function() { sendUser(); };
-    return display;
+    document.getElementById('send').onclick = function() { func(); };
+    document.getElementById('user-input').onkeypress = function(event) {if (event.key === 'Enter') func() };
+    return;
 }
