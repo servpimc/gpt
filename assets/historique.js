@@ -37,7 +37,6 @@ async function loadChat(userEmail, chatId) {
     if (!response.ok) throw new Error(`Erreur: ${response.status}`);
 
     const messages = await response.json();
-    if(document.getElementById("name").style.display == 'none') toggleUserChat();
     newChat();
     document.getElementById('title-chat').innerText=document.getElementById(chatId).innerText;
 
