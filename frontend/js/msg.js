@@ -20,6 +20,7 @@ async function sendIa() {
     const input = getInput();
     const files = Array.from(input.fileInput.files).slice(0, 3);
     const rawText = input.text.value.trim();
+    let fichier = `\n --- Fichiers joint --- \n`; 
 
     if (!rawText && files.length === 0) return;
 
@@ -27,13 +28,15 @@ async function sendIa() {
     for (const file of files) {
         const fileContent = await file.text();
         contenuFichiers += `\n\n--- Fichier (${file.name}) ---\n${fileContent}`;
+        fichier = fichier+`- ${file.name}\n`;
     }
 
     const messageText = obfusque(contenuFichiers);
 
     input.text.value = '';
     input.fileInput.value = '';
-    appendMessage(messageText, 'user');
+    if(file.length===0)fichier="";
+    appendMessage(rawText+fichier, 'user');
     closeDrawer();
 
     const loadingId = appendMessage("Je réfléchis...", 'agent');
