@@ -35,7 +35,7 @@ async function sendIa() {
 
     input.text.value = '';
     input.fileInput.value = '';
-    if(file.length===0)fichier="";
+    if( files.length === 0)fichier="";
     appendMessage(rawText+fichier, 'user');
     closeDrawer();
 
