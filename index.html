@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IA quoi maintenant</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script defer src="./frontend/js/script.js"></script>
+    <script defer src="./frontend/js/login.js"></script>
+    <script defer src="./frontend/js/input.js"></script>
+    <script defer src="./frontend/js/msg.js"></script>
+    <script defer src="./frontend/js/historique.js"></script>
+    <link rel="stylesheet" href="./frontend/assets/style.css">
+</head>
+<body>
+    <dialog id="google">
+        <h2 id="google-h2">Connectez-vous à Google</h2>
+        <div id="google-btn"></div>
+    </dialog>
+
+    <div id="entete">
+        <h2 id="title-chat">Nouvelle discution</h2>
+        <button id="name" value="edit" onclick="rename(document.getElementById('name').value)">✏️</button>
+    </div>
+
+    <nav id="sidebar">
+        <button id="toggle-sidebar" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+        <button id="new-chat" onclick="newChat()">NEW</button>
+        <div id="select-cat">
+            <button class='selected' style="width:45%" onclick="afficheHistorique();">historique</button>
+        </div>
+        <ul id="container-chanel">
+        </ul>
+    </nav>
+    <div id="content">
+        
+        <div class="card" id="chat-container">
+            <div id="msg-agent-0" class="message agent">Bienvenue ! Connectez-vous avec Google pour démarrer une conversation.</div>
+        </div>
+        <br>
+        <div class="card" id="input-container">
+            <div id="file-drawer" class="drawer-hidden">
+                <ul id="file-list"></ul>
+            </div>
+
+            <input type="file" id="fileInput" accept=".txt,.js,.py,.json,.md,.css,.html" hidden="true" multiple/>
+            <label for="fileInput" id="file">></label>
+            <input type="text" id="user-input" placeholder="Écris ton message ici..." onkeypress="if(event.key === 'Enter') sendIa()">
+
+            <div class="custom-dropdown" id="modelSelect">
+                <input type="hidden" name="model" id="model-select" value="llama">
+                <button type="button" id="model-trigger" aria-haspopup="listbox" aria-expanded="false" onclick="toggleDrawer()">
+                    <span id="model">Llama</span>
+                    <span class="arrow">▾</span>
+                </button>
+                <div class="dropdown-drawer">
+                    <ul class="options-list" role="listbox">
+                        <li class="option-item active" data-value="llama" role="option">
+                            <div class="option-title">Llama</div>
+                            <div class="option-desc">Llama4.17b</div>
+                        </li>
+                        <li class="option-item" data-value="open" role="option">
+                            <div class="option-title">Open Router</div>
+                            <div class="option-desc">agent aleatoir</div>
+                        </li>
+                        <li class="option-item" data-value="qwen" role="option">
+                            <div class="option-title">Qwen</div>
+                            <div class="option-desc">Qwen3.8-27b</div>
+                        </li>
+                        <li class="option-item" data-value="openai" role="option">
+                            <div class="option-title">Gpt</div>
+                            <div class="option-desc">Gpt-oss.20b</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <button onclick="sendIa()" id="send">⌲</button>
+        </div>
+        
+    </div>
+    
+</body>
+</html>
